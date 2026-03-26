@@ -1,0 +1,929 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>IronMind — Forge Your Strongest Self</title>
+  <style>
+    /* ── Reset & Base ── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:        #0a0a0f;
+      --surface:   #11111a;
+      --card:      #16161f;
+      --border:    #1e1e2e;
+      --accent:    #e85d26;
+      --accent2:   #ff8c42;
+      --gold:      #f5c842;
+      --text:      #e8e8f0;
+      --muted:     #7a7a9a;
+      --radius:    12px;
+      --radius-lg: 20px;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    /* ── Noise texture overlay ── */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ── Navigation ── */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1.2rem 2.5rem;
+      background: rgba(10, 10, 15, 0.75);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+
+    .logo {
+      font-size: 1.5rem;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .logo span { color: var(--text); -webkit-text-fill-color: var(--text); }
+
+    nav ul {
+      display: flex;
+      gap: 2rem;
+      list-style: none;
+    }
+
+    nav a {
+      text-decoration: none;
+      color: var(--muted);
+      font-size: 0.9rem;
+      font-weight: 500;
+      transition: color 0.2s;
+    }
+
+    nav a:hover { color: var(--text); }
+
+    .nav-cta {
+      background: var(--accent);
+      color: #fff !important;
+      padding: 0.5rem 1.25rem;
+      border-radius: 8px;
+      transition: background 0.2s, transform 0.15s !important;
+    }
+
+    .nav-cta:hover {
+      background: var(--accent2) !important;
+      transform: translateY(-1px);
+    }
+
+    /* ── Hero ── */
+    .hero {
+      position: relative;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 7rem 1.5rem 5rem;
+      overflow: hidden;
+    }
+
+    /* Radial glow blobs */
+    .hero::after {
+      content: '';
+      position: absolute;
+      top: 15%;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 700px;
+      height: 700px;
+      background: radial-gradient(circle, rgba(232,93,38,0.18) 0%, transparent 65%);
+      pointer-events: none;
+    }
+
+    .hero-grid {
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(232,93,38,0.07) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(232,93,38,0.07) 1px, transparent 1px);
+      background-size: 60px 60px;
+      mask-image: radial-gradient(ellipse 80% 60% at 50% 0%, black 30%, transparent 100%);
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 1;
+      max-width: 860px;
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: rgba(232,93,38,0.12);
+      border: 1px solid rgba(232,93,38,0.3);
+      color: var(--accent2);
+      font-size: 0.78rem;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 0.4rem 1rem;
+      border-radius: 100px;
+      margin-bottom: 1.8rem;
+    }
+
+    .hero-badge::before {
+      content: '';
+      width: 6px; height: 6px;
+      background: var(--accent);
+      border-radius: 50%;
+      animation: pulse 1.8s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(1.4); }
+    }
+
+    h1 {
+      font-size: clamp(2.8rem, 7vw, 5.5rem);
+      font-weight: 900;
+      line-height: 1.05;
+      letter-spacing: -0.04em;
+      margin-bottom: 1.5rem;
+    }
+
+    h1 em {
+      font-style: normal;
+      background: linear-gradient(135deg, var(--accent) 0%, var(--accent2) 50%, var(--gold) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .hero-sub {
+      font-size: clamp(1rem, 2vw, 1.22rem);
+      color: var(--muted);
+      max-width: 560px;
+      margin: 0 auto 2.5rem;
+    }
+
+    .hero-actions {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      color: #fff;
+      font-size: 1rem;
+      font-weight: 700;
+      padding: 0.9rem 2rem;
+      border-radius: var(--radius);
+      text-decoration: none;
+      border: none;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+      box-shadow: 0 0 30px rgba(232,93,38,0.35);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 0 45px rgba(232,93,38,0.5);
+    }
+
+    .btn-secondary {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: transparent;
+      color: var(--text);
+      font-size: 1rem;
+      font-weight: 600;
+      padding: 0.9rem 2rem;
+      border-radius: var(--radius);
+      text-decoration: none;
+      border: 1px solid var(--border);
+      cursor: pointer;
+      transition: border-color 0.2s, background 0.2s;
+    }
+
+    .btn-secondary:hover {
+      border-color: var(--muted);
+      background: rgba(255,255,255,0.04);
+    }
+
+    .hero-stats {
+      margin-top: 4rem;
+      display: flex;
+      justify-content: center;
+      gap: 3rem;
+      flex-wrap: wrap;
+    }
+
+    .stat { text-align: center; }
+
+    .stat-value {
+      font-size: 2rem;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .stat-label {
+      font-size: 0.8rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+    }
+
+    /* ── Section shared ── */
+    section { position: relative; z-index: 1; }
+
+    .section-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 6rem 1.5rem;
+    }
+
+    .section-label {
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 0.75rem;
+    }
+
+    .section-title {
+      font-size: clamp(1.9rem, 4vw, 2.8rem);
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      margin-bottom: 1rem;
+    }
+
+    .section-desc {
+      color: var(--muted);
+      font-size: 1.05rem;
+      max-width: 560px;
+    }
+
+    /* ── Features ── */
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 1.5rem;
+      margin-top: 3.5rem;
+    }
+
+    .feature-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 2rem;
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.25s, border-color 0.25s;
+    }
+
+    .feature-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+      opacity: 0;
+      transition: opacity 0.25s;
+    }
+
+    .feature-card:hover { transform: translateY(-4px); border-color: rgba(232,93,38,0.3); }
+    .feature-card:hover::before { opacity: 1; }
+
+    .feature-icon {
+      width: 52px; height: 52px;
+      border-radius: 12px;
+      background: rgba(232,93,38,0.12);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.6rem;
+      margin-bottom: 1.25rem;
+    }
+
+    .feature-title {
+      font-size: 1.15rem;
+      font-weight: 700;
+      margin-bottom: 0.6rem;
+    }
+
+    .feature-desc {
+      font-size: 0.92rem;
+      color: var(--muted);
+      line-height: 1.7;
+    }
+
+    .feature-tag {
+      display: inline-block;
+      margin-top: 1.2rem;
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--accent2);
+      background: rgba(232,93,38,0.1);
+      padding: 0.3rem 0.75rem;
+      border-radius: 100px;
+    }
+
+    /* ── Social proof band ── */
+    .proof-band {
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      overflow: hidden;
+      padding: 1.5rem 0;
+    }
+
+    .proof-track {
+      display: flex;
+      gap: 3rem;
+      animation: scroll 22s linear infinite;
+      width: max-content;
+    }
+
+    @keyframes scroll {
+      from { transform: translateX(0); }
+      to   { transform: translateX(-50%); }
+    }
+
+    .proof-item {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      white-space: nowrap;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--muted);
+    }
+
+    .proof-item::before { content: '★'; color: var(--gold); font-size: 1rem; }
+
+    /* ── Pricing ── */
+    .pricing-section { background: var(--surface); }
+
+    .pricing-toggle {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-top: 1.5rem;
+      font-size: 0.88rem;
+      color: var(--muted);
+    }
+
+    .toggle-switch {
+      width: 44px; height: 24px;
+      background: var(--accent);
+      border-radius: 100px;
+      position: relative;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .toggle-switch::after {
+      content: '';
+      position: absolute;
+      top: 3px; left: 22px;
+      width: 18px; height: 18px;
+      background: #fff;
+      border-radius: 50%;
+      transition: left 0.2s;
+    }
+
+    .save-badge {
+      background: rgba(245,200,66,0.15);
+      color: var(--gold);
+      font-size: 0.72rem;
+      font-weight: 700;
+      padding: 0.2rem 0.6rem;
+      border-radius: 100px;
+      letter-spacing: 0.04em;
+    }
+
+    .pricing-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.5rem;
+      margin-top: 3rem;
+      align-items: start;
+    }
+
+    .price-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 2rem;
+      transition: transform 0.25s;
+    }
+
+    .price-card:hover { transform: translateY(-4px); }
+
+    .price-card.featured {
+      border-color: var(--accent);
+      position: relative;
+      background: linear-gradient(135deg, rgba(232,93,38,0.08), rgba(255,140,66,0.04));
+      box-shadow: 0 0 60px rgba(232,93,38,0.15);
+    }
+
+    .featured-badge {
+      position: absolute;
+      top: -13px; left: 50%; transform: translateX(-50%);
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      color: #fff;
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+      padding: 0.3rem 1rem;
+      border-radius: 100px;
+      white-space: nowrap;
+    }
+
+    .plan-name {
+      font-size: 0.8rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 0.5rem;
+    }
+
+    .plan-price {
+      font-size: 3rem;
+      font-weight: 900;
+      letter-spacing: -0.04em;
+      line-height: 1;
+      margin-bottom: 0.25rem;
+    }
+
+    .plan-price sup {
+      font-size: 1.2rem;
+      font-weight: 700;
+      vertical-align: super;
+      letter-spacing: 0;
+    }
+
+    .plan-price .per {
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: var(--muted);
+      letter-spacing: 0;
+    }
+
+    .plan-desc {
+      font-size: 0.88rem;
+      color: var(--muted);
+      margin-bottom: 1.5rem;
+      padding-bottom: 1.5rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .plan-features {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      margin-bottom: 2rem;
+    }
+
+    .plan-features li {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.6rem;
+      font-size: 0.9rem;
+    }
+
+    .plan-features li::before {
+      content: '✓';
+      color: var(--accent);
+      font-weight: 700;
+      flex-shrink: 0;
+      margin-top: 0.05rem;
+    }
+
+    .plan-features li.muted { color: var(--muted); }
+    .plan-features li.muted::before { content: '–'; color: var(--border); }
+
+    .btn-plan {
+      display: block;
+      width: 100%;
+      text-align: center;
+      padding: 0.85rem;
+      border-radius: var(--radius);
+      font-size: 0.95rem;
+      font-weight: 700;
+      cursor: pointer;
+      border: none;
+      transition: transform 0.2s, box-shadow 0.2s;
+      text-decoration: none;
+    }
+
+    .btn-plan-outline {
+      background: transparent;
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+
+    .btn-plan-outline:hover { border-color: var(--muted); background: rgba(255,255,255,0.04); }
+
+    .btn-plan-fill {
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      color: #fff;
+      box-shadow: 0 0 25px rgba(232,93,38,0.3);
+    }
+
+    .btn-plan-fill:hover { transform: translateY(-2px); box-shadow: 0 0 40px rgba(232,93,38,0.45); }
+
+    /* ── Sign-up CTA ── */
+    .cta-section {
+      text-align: center;
+      padding: 7rem 1.5rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .cta-section::before {
+      content: '';
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      width: 800px; height: 500px;
+      background: radial-gradient(ellipse, rgba(232,93,38,0.12) 0%, transparent 65%);
+      pointer-events: none;
+    }
+
+    .cta-inner { position: relative; z-index: 1; max-width: 640px; margin: 0 auto; }
+
+    .cta-title {
+      font-size: clamp(2rem, 5vw, 3.5rem);
+      font-weight: 900;
+      letter-spacing: -0.04em;
+      margin-bottom: 1rem;
+    }
+
+    .cta-desc {
+      color: var(--muted);
+      font-size: 1.05rem;
+      margin-bottom: 2.5rem;
+    }
+
+    .signup-form {
+      display: flex;
+      gap: 0.75rem;
+      max-width: 440px;
+      margin: 0 auto;
+    }
+
+    .signup-input {
+      flex: 1;
+      padding: 0.9rem 1.2rem;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      color: var(--text);
+      font-size: 0.95rem;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .signup-input:focus { border-color: var(--accent); }
+    .signup-input::placeholder { color: var(--muted); }
+
+    /* ── Footer ── */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 2rem 2.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: gap;
+      color: var(--muted);
+      font-size: 0.83rem;
+    }
+
+    .footer-links {
+      display: flex;
+      gap: 1.5rem;
+    }
+
+    .footer-links a {
+      color: var(--muted);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+
+    .footer-links a:hover { color: var(--text); }
+
+    /* ── Responsive ── */
+    @media (max-width: 600px) {
+      nav ul { display: none; }
+      .signup-form { flex-direction: column; }
+      .hero-stats { gap: 1.5rem; }
+      footer { flex-direction: column; gap: 1rem; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav>
+    <div class="logo">Iron<span>Mind</span></div>
+    <ul>
+      <li><a href="#features">Features</a></li>
+      <li><a href="#pricing">Pricing</a></li>
+      <li><a href="#signup">Start Free</a></li>
+    </ul>
+    <a href="#signup" class="nav-cta">Get Started</a>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-grid"></div>
+    <div class="hero-content">
+      <div class="hero-badge">Now in open beta &mdash; join 50,000+ athletes</div>
+      <h1>Train Harder.<br><em>Think Stronger.</em><br>Become Unstoppable.</h1>
+      <p class="hero-sub">
+        IronMind fuses AI-driven programming, real-time biometric feedback,
+        and elite mental conditioning into one relentless fitness platform.
+      </p>
+      <div class="hero-actions">
+        <a href="#signup" class="btn-primary">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+          Start For Free
+        </a>
+        <a href="#features" class="btn-secondary">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/></svg>
+          See How It Works
+        </a>
+      </div>
+      <div class="hero-stats">
+        <div class="stat">
+          <div class="stat-value">50K+</div>
+          <div class="stat-label">Active Athletes</div>
+        </div>
+        <div class="stat">
+          <div class="stat-value">4.9★</div>
+          <div class="stat-label">App Store Rating</div>
+        </div>
+        <div class="stat">
+          <div class="stat-value">2.4M</div>
+          <div class="stat-label">Workouts Logged</div>
+        </div>
+        <div class="stat">
+          <div class="stat-value">91%</div>
+          <div class="stat-label">Goal Achievement</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SOCIAL PROOF BAND -->
+  <div class="proof-band" aria-hidden="true">
+    <div class="proof-track">
+      <span class="proof-item">Life-changing programming</span>
+      <span class="proof-item">Best fitness app I've ever used</span>
+      <span class="proof-item">Hit my first powerlifting PR in 6 weeks</span>
+      <span class="proof-item">The AI coach actually gets me</span>
+      <span class="proof-item">Lost 18 lbs in 3 months</span>
+      <span class="proof-item">Absolutely elite platform</span>
+      <span class="proof-item">Nothing else comes close</span>
+      <span class="proof-item">Life-changing programming</span>
+      <span class="proof-item">Best fitness app I've ever used</span>
+      <span class="proof-item">Hit my first powerlifting PR in 6 weeks</span>
+      <span class="proof-item">The AI coach actually gets me</span>
+      <span class="proof-item">Lost 18 lbs in 3 months</span>
+      <span class="proof-item">Absolutely elite platform</span>
+      <span class="proof-item">Nothing else comes close</span>
+    </div>
+  </div>
+
+  <!-- FEATURES -->
+  <section id="features">
+    <div class="section-inner">
+      <p class="section-label">Why IronMind</p>
+      <h2 class="section-title">Built for athletes who<br>refuse to plateau.</h2>
+      <p class="section-desc">Three pillars engineered to push your mind and body to the next level — every single session.</p>
+
+      <div class="features-grid">
+
+        <div class="feature-card">
+          <div class="feature-icon">🧠</div>
+          <div class="feature-title">AI-Powered Adaptive Coaching</div>
+          <p class="feature-desc">
+            Your personal AI coach analyzes recovery, sleep, HRV, and past performance in real-time,
+            generating a perfectly periodized program that evolves as fast as you do. No cookie-cutter plans — ever.
+          </p>
+          <span class="feature-tag">Smart Programming</span>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon">⚡</div>
+          <div class="feature-title">Real-Time Biometric Feedback</div>
+          <p class="feature-desc">
+            Syncs with Apple Watch, Garmin, WHOOP, and Oura to deliver live rep tracking,
+            load recommendations, and automatic deload triggers — so you always train at the edge, never over it.
+          </p>
+          <span class="feature-tag">Wearable Sync</span>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon">🔥</div>
+          <div class="feature-title">Mental Performance Engine</div>
+          <p class="feature-desc">
+            Scientifically grounded visualization protocols, breathwork routines, and focus drills used by
+            elite athletes. Build the mindset that turns hard training into unbreakable confidence.
+          </p>
+          <span class="feature-tag">Elite Mindset</span>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- PRICING -->
+  <section id="pricing" class="pricing-section">
+    <div class="section-inner">
+      <p class="section-label">Pricing</p>
+      <h2 class="section-title">Invest in yourself.</h2>
+      <p class="section-desc">Start free. Upgrade when you're ready. Cancel anytime with zero friction.</p>
+
+      <div class="pricing-toggle">
+        <span>Monthly</span>
+        <div class="toggle-switch" role="switch" aria-checked="true"></div>
+        <span>Annual</span>
+        <span class="save-badge">SAVE 40%</span>
+      </div>
+
+      <div class="pricing-grid">
+
+        <!-- FREE -->
+        <div class="price-card">
+          <p class="plan-name">Starter</p>
+          <div class="plan-price"><sup>$</sup>0<span class="per"> / mo</span></div>
+          <p class="plan-desc">Everything you need to start building the habit.</p>
+          <ul class="plan-features">
+            <li>3 workouts per week</li>
+            <li>Basic movement library (200+ exercises)</li>
+            <li>Progress tracking & charts</li>
+            <li>Community feed access</li>
+            <li class="muted">AI adaptive coaching</li>
+            <li class="muted">Biometric sync</li>
+            <li class="muted">Mental performance tools</li>
+          </ul>
+          <a href="#signup" class="btn-plan btn-plan-outline">Get Started Free</a>
+        </div>
+
+        <!-- PRO (featured) -->
+        <div class="price-card featured">
+          <div class="featured-badge">Most Popular</div>
+          <p class="plan-name">Pro</p>
+          <div class="plan-price"><sup>$</sup>14<span class="per"> / mo</span></div>
+          <p class="plan-desc">Full access for serious athletes ready to level up.</p>
+          <ul class="plan-features">
+            <li>Unlimited workouts</li>
+            <li>Full exercise library (1,500+ movements)</li>
+            <li>AI adaptive coaching engine</li>
+            <li>Biometric & wearable sync</li>
+            <li>Mental performance toolkit</li>
+            <li>Priority support</li>
+            <li class="muted">1-on-1 coach sessions</li>
+          </ul>
+          <a href="#signup" class="btn-plan btn-plan-fill">Start 14-Day Free Trial</a>
+        </div>
+
+        <!-- ELITE -->
+        <div class="price-card">
+          <p class="plan-name">Elite</p>
+          <div class="plan-price"><sup>$</sup>39<span class="per"> / mo</span></div>
+          <p class="plan-desc">For competitors and coaches who demand the absolute best.</p>
+          <ul class="plan-features">
+            <li>Everything in Pro</li>
+            <li>2 live coach sessions / month</li>
+            <li>Custom nutrition programming</li>
+            <li>Advanced analytics dashboard</li>
+            <li>Team & athlete management</li>
+            <li>White-glove onboarding</li>
+            <li>Dedicated account manager</li>
+          </ul>
+          <a href="#signup" class="btn-plan btn-plan-outline">Get Elite Access</a>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA / SIGN UP -->
+  <section id="signup" class="cta-section">
+    <div class="cta-inner">
+      <p class="section-label" style="text-align:center">Join IronMind</p>
+      <h2 class="cta-title">Your strongest self<br>starts <em style="font-style:normal;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">right now.</em></h2>
+      <p class="cta-desc">Free forever on Starter. No credit card required. Cancel Pro / Elite anytime.</p>
+      <form class="signup-form" onsubmit="handleSignup(event)">
+        <input type="email" class="signup-input" placeholder="your@email.com" required />
+        <button type="submit" class="btn-primary">Sign Up Free</button>
+      </form>
+      <p style="margin-top:1rem;font-size:0.8rem;color:var(--muted)">
+        Join 50,000+ athletes already training smarter.
+      </p>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="logo" style="font-size:1.1rem">Iron<span style="background:none;-webkit-text-fill-color:var(--text);color:var(--text)">Mind</span></div>
+    <div class="footer-links">
+      <a href="#">Privacy</a>
+      <a href="#">Terms</a>
+      <a href="#">Support</a>
+      <a href="#">Blog</a>
+    </div>
+    <span>&copy; 2026 IronMind Inc. All rights reserved.</span>
+  </footer>
+
+  <script>
+    // Sign-up form
+    function handleSignup(e) {
+      e.preventDefault();
+      const input = e.target.querySelector('input');
+      const btn = e.target.querySelector('button');
+      btn.textContent = '✓ You\'re In!';
+      btn.style.background = 'linear-gradient(135deg,#22c55e,#16a34a)';
+      btn.style.boxShadow = '0 0 30px rgba(34,197,94,0.4)';
+      input.value = '';
+      input.placeholder = 'Welcome to IronMind!';
+      setTimeout(() => {
+        btn.textContent = 'Sign Up Free';
+        btn.style.background = '';
+        btn.style.boxShadow = '';
+        input.placeholder = 'your@email.com';
+      }, 3500);
+    }
+
+    // Intersection observer for fade-in cards
+    const observer = new IntersectionObserver(
+      entries => entries.forEach(e => {
+        if (e.isIntersecting) {
+          e.target.style.opacity = '1';
+          e.target.style.transform = e.target.classList.contains('featured')
+            ? 'translateY(0)' : 'translateY(0)';
+        }
+      }),
+      { threshold: 0.1 }
+    );
+
+    document.querySelectorAll('.feature-card, .price-card').forEach(el => {
+      el.style.opacity = '0';
+      el.style.transform = 'translateY(24px)';
+      el.style.transition = 'opacity 0.5s ease, transform 0.5s ease, border-color 0.25s';
+      observer.observe(el);
+    });
+
+    // Nav active scroll highlight
+    window.addEventListener('scroll', () => {
+      const nav = document.querySelector('nav');
+      nav.style.background = window.scrollY > 50
+        ? 'rgba(10,10,15,0.95)'
+        : 'rgba(10,10,15,0.75)';
+    });
+  </script>
+</body>
+</html>
